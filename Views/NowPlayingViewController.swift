@@ -38,9 +38,9 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     }
     //For network request
     func fetchMovies(){
-    let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")!
-    let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-
+        let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=a07e22bc18f5cb106bfe4cc1f83ad8ed")!
+        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
+        
         
         // Makes a network request to get updated data
         // Updates the tableView with the new data
@@ -64,25 +64,25 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
             task.resume()
         }
         
-    let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-    let task = session.dataTask(with: request) { (data, response, error) in
-        if let error = error{
-            print(error.localizedDescription)
-        } else if let data=data{
-            let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-            let movies = dataDictionary["results"] as! [[String:Any]]
-            self.movies = movies
-            self.tableView.reloadData()
-            self.refreshControl.endRefreshing()
+        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
+        let task = session.dataTask(with: request) { (data, response, error) in
+            if let error = error{
+                print(error.localizedDescription)
+            } else if let data=data{
+                let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
+                let movies = dataDictionary["results"] as! [[String:Any]]
+                self.movies = movies
+                self.tableView.reloadData()
+                self.refreshControl.endRefreshing()
+            }
+            
         }
         
-        }
-
-            //This will run when the network request returns
-            
+        //This will run when the network request returns
+        
         task.resume()
-            
-            
+        
+        
     }
     
     func tableView(_ tableVIew: UITableView, numberOfRowsInSection section: Int) ->
@@ -109,9 +109,17 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
         return cell
     }
     
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let cell = sender as! UITableViewCell
+        if let indexPath = tableView.indexPath(for: cell){
+            let movie = movies[indexPath.row]
+            let detailViewController = segue.destination as! DetailViewController
+            detailViewController.movie = movie
+        }
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         //Dispose of any resources that can be recreated.
     }
-    
 }
